@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Analysis AI Prototype</title>
+    <!-- This line pulls in Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- This line pulls in a nice font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* A little bit of custom style for the page and loading spinner */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .loader {
+            border-top-color: #3498db;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto px-4 py-8 md:py-12">
+        <!-- 1. THE HEADER SECTION -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Financial Competence Analysis AI</h1>
+            <p class="mt-2 text-lg text-gray-600">A prototype to summarize and generate insights from financial text.</p>
+        </header>
+
+        <main class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6 md:p-8">
+            
+            <!-- 2. THE INPUT SECTION -->
+            <div>
+                <label for="financial-text" class="block text-lg font-medium text-gray-700 mb-2">Paste Financial Text Below</label>
+                <textarea id="financial-text" rows="10" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="e.g., Paste an excerpt from a quarterly earnings report..."></textarea>
+            </div>
+
+            <div class="text-center mt-6">
+                <button id="analyze-button" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition transform hover:scale-105 duration-300">
+                    Analyze Financial Text
+                </button>
+            </div>
+
+            <!-- 3. THE OUTPUT SECTION (Initially Hidden) -->
+            <div id="output-section" class="mt-8 pt-6 border-t border-gray-200 hidden">
+                <!-- Loader shows while "thinking" -->
+                <div id="loader" class="flex justify-center items-center my-4 hidden">
+                    <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+                    <p class="ml-4 text-gray-600">Analyzing...</p>
+                </div>
+                
+                <!-- Results appear here -->
+                <div id="results" class="hidden">
+                    <div class="mb-6">
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-3">Generated Summary</h3>
+                        <div id="summary-output" class="bg-gray-50 p-4 rounded-lg text-gray-700 leading-relaxed"></div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-3">Insightful Prompts</h3>
+                        <ul id="prompts-output" class="list-disc list-inside space-y-2 bg-gray-50 p-4 rounded-lg text-gray-700">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="text-center mt-8 text-gray-500">
+            <p>Prototype for FOSSEE Internship Submission by Dhruv Gupta</p>
+        </footer>
+    </div>
+
+    <!-- 4. THE JAVASCRIPT LOGIC -->
+    <script>
+        // Get references to the HTML elements we need to work with
+        const analyzeButton = document.getElementById('analyze-button');
+        const financialTextInput = document.getElementById('financial-text');
+        const outputSection = document.getElementById('output-section');
+        const loader = document.getElementById('loader');
+        const results = document.getElementById('results');
+        const summaryOutput = document.getElementById('summary-output');
+        const promptsOutput = document.getElementById('prompts-output');
+        
+        // Let's pre-fill the text box with a good example for the demo
+        financialTextInput.value = `Q4 2025 Earnings Report Excerpt: AlphaCorp reported a quarterly revenue of $1.2 billion, a 15% increase year-over-year, beating analyst expectations. However, the company's net profit margin decreased from 18% to 14% due to rising supply chain costs and increased R&D spending on their new AI division. The management noted a significant slowdown in their European market, which they attribute to recent regulatory changes. They are projecting a conservative 5-7% growth for the next quarter.`;
+
+        // This is what happens when the user clicks the "Analyze" button
+        analyzeButton.addEventListener('click', () => {
+            // Don't do anything if the text box is empty
+            if (financialTextInput.value.trim() === "") {
+                alert("Please paste some financial text to analyze.");
+                return;
+            }
+
+            // --- Show the loading spinner ---
+            outputSection.classList.remove('hidden');
+            results.classList.add('hidden'); // Hide old results
+            loader.classList.remove('hidden');
+            analyzeButton.disabled = true; // Disable button while loading
+            analyzeButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+            // --- THIS IS THE FAKE AI CALL ---
+            // We use setTimeout to pretend we are waiting for a real AI model.
+            setTimeout(() => {
+                // This is our hardcoded, "fake" AI response
+                const summary = "AlphaCorp exceeded revenue expectations with a 15% YoY increase to $1.2B, but profitability declined as net margins fell to 14% from 18%. This was driven by higher supply chain and R&D costs. The company faces headwinds in Europe and projects slower growth next quarter.";
+                const prompts = [
+                    "What specific supply chain issues are causing the cost increase, and are they expected to be temporary or long-term?",
+                    "What is the expected return on investment for the increased R&D spending in the AI division?",
+                    "How are the recent regulatory changes in Europe impacting operations and future revenue streams?",
+                    "Given the slowdown, what is the company's strategy to mitigate risks in the European market?"
+                ];
+
+                // Put the fake response onto the page
+                summaryOutput.textContent = summary;
+                promptsOutput.innerHTML = ''; // Clear old prompts
+                prompts.forEach(prompt => {
+                    const li = document.createElement('li');
+                    li.textContent = prompt;
+                    promptsOutput.appendChild(li);
+                });
+                
+                // --- Hide the loader and show the results ---
+                loader.classList.add('hidden');
+                results.classList.remove('hidden');
+                analyzeButton.disabled = false; // Re-enable the button
+                analyzeButton.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            }, 2000); // We pretend it takes 2 seconds (2000 milliseconds)
+        });
+    </script>
+</body>
+</html>
+
